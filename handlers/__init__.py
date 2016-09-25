@@ -1,7 +1,10 @@
 import webapp2
 import logging
 import json
+
+from common.json_encoder import JSONEncoder
 class BaseHanler(webapp2.RequestHandler):
+
     def res(self, content='no content', status=200, content_type='application/json'):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
         self.response.set_status(status)
@@ -15,11 +18,9 @@ class BaseHanler(webapp2.RequestHandler):
         }
         self.res_json(error, status)
 
-
-
     def res_json(self, content, status=200):
         if isinstance(content, dict):
-            self.res(json.dumps(content), status)
+            self.res(json.dumps(content, cls=JSONEncoder), status)
         else:
             err_msg = 'content is not dict'
             logging.error(err_msg)
