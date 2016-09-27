@@ -10,7 +10,11 @@ class UserProperty(ndb.Model):
     email = ndb.StringProperty()
     password = ndb.StringProperty()
     name = ndb.StringProperty()
-    access_level = ndb.IntegerProperty()
+    access_level = ndb.IntegerProperty(default=AccessLevel.NORMAL)
 
 class User(UserProperty, BaseModel):
-    pass
+
+    def to_dict(self, include=None, exclude=None):
+        d = super(User, self).to_dict(include, exclude)
+        del d['password']
+        return d

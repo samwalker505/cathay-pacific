@@ -3,8 +3,11 @@ api_version: 1
 threadsafe: yes
 
 handlers:
-- url: /(.*)
-  script: handlers.\1.app
+- url: /api/v(.?)/(.*)/(.*)
+  script: handlers.\2.app
+
+- url: /api/v(.?)/(.*)
+  script: handlers.\2.app
 
 - url: /.*
   script: handlers.main.app
