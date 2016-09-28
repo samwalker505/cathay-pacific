@@ -19,17 +19,21 @@ class WSGIApplication(webapp2.WSGIApplication):
 
         return rv
 
-    def route(self, url='/', api=False, api_ver=config.API_VER, *args, **kwargs):
+    def route(self, url='/', *args, **kwargs):
         def wrapper(func):
-            if api:
-                base_url = '/api/{}{}'.format(api_ver, url)
-                logging.debug(base_url)
-            else:
-                base_url = url
+            self.router.add(webapp2.Route(url, handler=func, *args, **kwargs))
+            return func
+        return wrapper
+
+    def api(self, url='/', api_ver=config.API_VER, *args, **kwargs):
+        def wrapper(func):
+            base_url = '/api/{}{}'.format(api_ver, url)
+            logging.debug(base_url)
             self.router.add(webapp2.Route(base_url, handler=func, *args, **kwargs))
             return func
 
         return wrapper
+
 
     def routes(self, urls, *args, **kwargs):
         if not isinstance(urls, collections.Iterable):
