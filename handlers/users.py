@@ -5,15 +5,16 @@ from validate_email import validate_email
 import common.micro_webapp2 as micro_webapp2
 from models.user import User
 from models.email import Email
-from handlers import BaseHanler
+from handlers import BaseHanler, user_authenticate
 from common.constants import Error
 app = micro_webapp2.WSGIApplication()
 
 @app.api('/users')
 class UsersHandler(BaseHanler):
 
+    @user_authenticate
     def get(self):
-        self.response.write('Testing')
+        self.res_json(self.user.to_dict())
 
     def post(self):
         email = self.json_body.get('email')

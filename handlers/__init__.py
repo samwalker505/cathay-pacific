@@ -1,8 +1,32 @@
+#!
 import webapp2
 import logging
 import json
 
 from common.json_encoder import JSONEncoder
+import common.config as config
+
+def user_authenticate(func):
+    def func_wrapper(self, *args, **kwargs):
+        token = self.request.headers.get(config.HEADER_ACCESS_TOKEN)
+        logging.debug('Token: {}'.format(token))
+        if not token:
+            self.abort(403)
+
+        import jwt
+        import secret
+        from models.user import User
+
+        decoded = jwt.decode(token, secret.secret, algorithms=['HS256'])
+        logging.debug('decoded: {}'.format(decoded))
+        if decoded:
+            user = User.get_by_id(long(decoded['id']))
+            self.user = user
+            func(self, *args, **kwargs)
+        else:
+            self.abort(403)
+    return func_wrapper
+
 class BaseHanler(webapp2.RequestHandler):
 
     def __init__(self, request, response):
