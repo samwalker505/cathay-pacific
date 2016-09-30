@@ -18,3 +18,7 @@ class User(UserProperty, BaseModel):
         d = super(User, self).to_dict(include, exclude)
         del d['password']
         return d
+
+class Secret(BaseModel):
+    secret = ndb.StringProperty()
+    owner = ndb.KeyProperty()

@@ -10,18 +10,21 @@ def user_authenticate(func):
     def func_wrapper(self, *args, **kwargs):
         token = self.request.headers.get(config.HEADER_ACCESS_TOKEN)
         logging.debug('Token: {}'.format(token))
-        if not token:
+        tokenArr = token.split('::')
+        if not token or len(tokenArr)< 2:
             self.abort(403)
 
         import jwt
-        import secret
-        from models.user import User
-
-        decoded = jwt.decode(token, secret.secret, algorithms=['HS256'])
+        from models.user import User, Secret
+        jwt_token = tokenArr[0]
+        user_id = tokenArr[1]
+        s = Secret.get_by_id(user_id)
+        if not s:
+            self.abort(403)
+        decoded = jwt.decode(jwt_token, s.secret, algorithms=['HS256'])
         logging.debug('decoded: {}'.format(decoded))
         if decoded:
-            user = User.get_by_id(long(decoded['id']))
-            self.user = user
+            self.user = s.owner.get()
             func(self, *args, **kwargs)
         else:
             self.abort(403)
@@ -37,7 +40,10 @@ class BaseHanler(webapp2.RequestHandler):
         if self.request.headers['Content-Type'].split(';')[0] == 'application/json':
             logging.debug('Content-Type: json')
             self.json_body = json.loads(self.request.body)
-        super(BaseHanler, self).dispatch()
+        try:
+            super(BaseHanler, self).dispatch()
+        except Exception as e:
+            logging.debug(e)
 
     def res(self, content='no content', status=200, content_type='application/json'):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
