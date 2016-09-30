@@ -24,5 +24,8 @@ class ImagesHandler(BaseHanler):
                 user = self.user
             else:
                 user = None
-            image = Image.add(data[0].file.read(), data[0].filename, user)
-        return self.res_json(image.to_dict())
+            try:
+                image = Image.add(data[0].file.read(), data[0].filename, user)
+                return self.res_json(image.to_dict())
+            except:
+                return self.res_error('image not allowed')
