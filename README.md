@@ -1,20 +1,20 @@
-### API docs
+# API docs
 
 endpoint: `https://seed-project-v1.appspot.com/api/v1`
 all json except `/images`
 
-#users:
+###users:
 `POST /users`
 params:  email, password
 
 `GET /users/{id}`
 
-#tokens:
+###tokens:
 `POST /tokens`
 params: email, password
 set the token to header with X-WALKER-ACCESS-TOKEN
 
-#files:
+###files:
 `POST /files`
 using multipart
 params: file, file_type
@@ -23,11 +23,11 @@ description: if file_type == image, serving_url will be provided, otherwise
 download url via: `http://storage.googleapis.com/{gcs_path}`
 
 ##Change logs
-# 2016-10-01
+### 2016-10-01
 `POST /images` -> `POST /files`
 
 
 ## deleted
-#images:
+###images:
 `POST /images`
 params: image
