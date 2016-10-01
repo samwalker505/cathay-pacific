@@ -6,28 +6,50 @@ import json
 from common.json_encoder import JSONEncoder
 import common.config as config
 
+import jwt
+from models.user import User, Secret
+
+def get_secret(token):
+    logging.debug('Token: {}'.format(token))
+    if not token:
+        return None, None
+    else:
+        tokenArr = token.split('::')
+        if len(tokenArr) < 2:
+            return None, None
+
+        jwt_token = tokenArr[0]
+        user_id = tokenArr[1]
+        return Secret.get_by_id(user_id), jwt_token
+
+def get_user(token):
+    s, jwt_token = get_secret(token)
+    if not s:
+        return None
+    decoded = jwt.decode(jwt_token, s.secret, algorithms=['HS256'])
+    logging.debug('decoded: {}'.format(decoded))
+    if decoded:
+        return s.owner.get()
+    else:
+        return None
+    return None
+
 def user_authenticate(func):
     def func_wrapper(self, *args, **kwargs):
         token = self.request.headers.get(config.HEADER_ACCESS_TOKEN)
-        logging.debug('Token: {}'.format(token))
-        tokenArr = token.split('::')
-        if not token or len(tokenArr)< 2:
-            self.abort(403)
-
-        import jwt
-        from models.user import User, Secret
-        jwt_token = tokenArr[0]
-        user_id = tokenArr[1]
-        s = Secret.get_by_id(user_id)
-        if not s:
-            self.abort(403)
-        decoded = jwt.decode(jwt_token, s.secret, algorithms=['HS256'])
-        logging.debug('decoded: {}'.format(decoded))
-        if decoded:
-            self.user = s.owner.get()
+        user = get_user(token)
+        if user:
+            self.user = user
             func(self, *args, **kwargs)
         else:
             self.abort(403)
+    return func_wrapper
+
+def get_current_user(func):
+    def func_wrapper(self, *args, **kwargs):
+        token = self.request.headers.get(config.HEADER_ACCESS_TOKEN)
+        self.user = get_user(token)
+        func(self, *args, **kwargs)
     return func_wrapper
 
 class BaseHanler(webapp2.RequestHandler):

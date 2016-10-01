@@ -30,9 +30,13 @@ class UsersHandler(BaseHanler):
             logging.debug('password: {}'.format(password))
             return self.res_error(Error.NO_PASSWORD)
 
+        name = self.json_body.get('name')
+        name = name if name else email.split('@')[0]
+
         create_dict = {
             'email': email,
-            'password': md5.new(password).hexdigest()
+            'password': md5.new(password).hexdigest(),
+            'name': name
         }
         user = User.create(create_dict)
         e.owner = user.key

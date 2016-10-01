@@ -9,7 +9,6 @@ class FileProperties(ndb.Model):
     owner = ndb.KeyProperty()
     name = ndb.StringProperty()
     gcs_path = ndb.StringProperty()
-    url = ndb.StringProperty()
     blob_key = ndb.BlobProperty()
 
 class File(FileProperties, BaseModel):
@@ -34,11 +33,13 @@ class File(FileProperties, BaseModel):
         return f
 
 class Image(File):
+    serving_url = ndb.StringProperty()
+
     @classmethod
     def add(cls, data, filename='', owner=None):
         if not filename.endswith(('.jpg','.jpeg','.gif','.png','.bmp','.ico')):
             raise Exception('Not image')
         f = super(Image, cls).add(data, filename, owner)
-        f.url = images.get_serving_url(f.blob_key, secure_url=True)
+        f.serving_url = images.get_serving_url(f.blob_key, secure_url=True)
         f.put()
         return f
