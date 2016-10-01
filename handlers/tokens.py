@@ -7,7 +7,7 @@ import jwt
 import common.micro_webapp2 as micro_webapp2
 from handlers import BaseHanler
 from common.constants import Error
-from models.user import User, Secret
+from models.user import User, Secret, Facebook
 from models.email import Email
 app = micro_webapp2.WSGIApplication()
 
@@ -24,9 +24,21 @@ def gen_token(user):
     }
     return '{}::{}'.format(jwt.encode(payload, s.secret, algorithm='HS256'),user.key.id())
 
+def response_dict(user):
+    token = gen_token(user)
+    d = user.to_dict()
+    d['access_token'] = token
+    return d
+
 @app.api('/tokens')
 class TokensHandler(BaseHanler):
     def post(self):
+
+        if 'fat' in self.json_body:
+            fb = Facebook.connect_fb(self.json_body['fat'])
+            if fb.owner:
+                return self.res_json(response_dict(fb.owner.get()))
+
         email = self.json_body.get('email')
         password = self.json_body.get('password')
         if not email or not password:
@@ -37,9 +49,8 @@ class TokensHandler(BaseHanler):
             user = email_log.owner.get()
             if md5.new(password).hexdigest() != user.password:
                 return self.res_error(Error.INVALID_PASSWORD, status=403)
-            token = gen_token(user)
-            d = user.to_dict()
-            d['access_token'] = token
+
+            d = response_dict(user)
             return self.res_json(d)
         else:
             return self.res_error(Error.NO_USER)

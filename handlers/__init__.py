@@ -62,10 +62,8 @@ class BaseHanler(webapp2.RequestHandler):
         if self.request.headers['Content-Type'].split(';')[0] == 'application/json':
             logging.debug('Content-Type: json')
             self.json_body = json.loads(self.request.body)
-        try:
             super(BaseHanler, self).dispatch()
-        except Exception as e:
-            logging.debug(e)
+
 
     def res(self, content='no content', status=200, content_type='application/json'):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
@@ -84,6 +82,6 @@ class BaseHanler(webapp2.RequestHandler):
         if isinstance(content, dict):
             self.res(json.dumps(content, cls=JSONEncoder), status)
         else:
-            err_msg = 'content is not dict'
+            err_msg = 'res_json: content is not dict'
             logging.error(err_msg)
             self.res_error('content is not dict')

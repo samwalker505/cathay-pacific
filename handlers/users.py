@@ -3,7 +3,7 @@ import md5
 from validate_email import validate_email
 
 import common.micro_webapp2 as micro_webapp2
-from models.user import User
+from models.user import User, Facebook
 from models.email import Email
 from handlers import BaseHanler, user_authenticate
 from common.constants import Error
@@ -16,7 +16,38 @@ class UsersHandler(BaseHanler):
     def get(self):
         self.res_json(self.user.to_dict())
 
+    def connect_fb(self):
+        fb = Facebook.connect_fb(self.json_body['fat'])
+        if not fb:
+            return self.res_error('connect facebook error')
+
+        e = Email.get_or_insert(fb.email)
+
+        # email will have owner if registered
+        if e.owner:
+            # connect with existing user
+            user = e.owner.get()
+            user.facebook = fb
+            user.put()
+        else:
+            create_dict = {
+                'email':fb.email,
+                'name':fb.name,
+                'facebook':fb
+            }
+            user = User.create(create_dict)
+            e.owner = user.key
+            e.put()
+
+        fb.owner = user.key
+        fb.put()
+        return self.res_json(user.to_dict())
+
+
     def post(self):
+        if 'fat' in self.json_body:
+            return self.connect_fb()
+
         email = self.json_body.get('email')
         if not (email and validate_email(email)):
             return self.res_error(Error.INVALID_EMAIL)
@@ -48,6 +79,7 @@ class UserHandler(BaseHanler):
     def get(self, user_id):
         logging.debug(user_id)
         user = User.get_by_id(long(user_id))
+
         if user:
             return self.res_json(user.to_dict())
         else:
