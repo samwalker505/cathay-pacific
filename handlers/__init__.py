@@ -52,7 +52,7 @@ def get_current_user(func):
         func(self, *args, **kwargs)
     return func_wrapper
 
-class BaseHanler(webapp2.RequestHandler):
+class BaseHandler(webapp2.RequestHandler):
 
     def __init__(self, request, response):
         self.json_body = {}
@@ -62,8 +62,15 @@ class BaseHanler(webapp2.RequestHandler):
         if self.request.headers['Content-Type'].split(';')[0] == 'application/json':
             logging.debug('Content-Type: json')
             self.json_body = json.loads(self.request.body)
-            super(BaseHanler, self).dispatch()
+        # don't indent it ....
+        
+        super(BaseHandler, self).dispatch()
 
+    def get(self, *args, **kwargs):
+        pass
+
+    def post(self, *args, **kwargs):
+        pass
 
     def res(self, content='no content', status=200, content_type='application/json'):
         self.response.headers['Access-Control-Allow-Origin'] = '*'

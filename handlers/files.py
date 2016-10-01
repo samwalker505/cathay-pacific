@@ -4,15 +4,11 @@ from validate_email import validate_email
 
 import webapp2
 
-import common.micro_webapp2 as micro_webapp2
-
 from handlers import get_current_user, BaseHanler
 from common.constants import Error
 from models.file import Image, File
-app = micro_webapp2.WSGIApplication()
 
-@app.api('/files')
-class ImagesHandler(BaseHanler):
+class FilesHandler(BaseHanler):
 
     @get_current_user
     def post(self):
@@ -35,3 +31,7 @@ class ImagesHandler(BaseHanler):
         except Exception as e:
             logging.debug(e)
             return self.res_error('file not allowed')
+
+app = webapp2.WSGIApplication([
+    (r'/files', FilesHandler),
+])

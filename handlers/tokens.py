@@ -4,12 +4,11 @@ import time
 
 import jwt
 
-import common.micro_webapp2 as micro_webapp2
-from handlers import BaseHanler
+import webapp2
+from handlers import BaseHandler
 from common.constants import Error
 from models.user import User, Secret, Facebook
 from models.email import Email
-app = micro_webapp2.WSGIApplication()
 
 def gen_token(user):
     s = Secret.get_or_insert(str(user.key.id()))
@@ -30,8 +29,7 @@ def response_dict(user):
     d['access_token'] = token
     return d
 
-@app.api('/tokens')
-class TokensHandler(BaseHanler):
+class TokensHandler(BaseHandler):
     def post(self):
 
         if 'fat' in self.json_body:
@@ -54,3 +52,7 @@ class TokensHandler(BaseHanler):
             return self.res_json(d)
         else:
             return self.res_error(Error.NO_USER)
+
+app = webapp2.WSGIApplication([
+    (r'/api/v1/tokens', TokensHandler),
+])

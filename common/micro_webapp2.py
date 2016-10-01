@@ -1,9 +1,9 @@
+import inspect
 import webapp2
 import logging
 import collections
 
 import common.config as config
-
 class WSGIApplication(webapp2.WSGIApplication):
     def __init__(self, *args, **kwargs):
         super(WSGIApplication, self).__init__(*args, **kwargs)
@@ -29,6 +29,7 @@ class WSGIApplication(webapp2.WSGIApplication):
         def wrapper(func):
             base_url = '/api/{}{}'.format(api_ver, url)
             logging.debug(base_url)
+
             self.router.add(webapp2.Route(base_url, handler=func, *args, **kwargs))
             return func
 

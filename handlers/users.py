@@ -1,16 +1,18 @@
 import logging
 import md5
 from validate_email import validate_email
+import webapp2
 
-import common.micro_webapp2 as micro_webapp2
 from models.user import User, Facebook
 from models.email import Email
-from handlers import BaseHanler, user_authenticate
+from handlers import BaseHandler, user_authenticate
 from common.constants import Error
+
+import common.micro_webapp2 as micro_webapp2
 app = micro_webapp2.WSGIApplication()
 
 @app.api('/users')
-class UsersHandler(BaseHanler):
+class UsersHandler(BaseHandler):
 
     @user_authenticate
     def get(self):
@@ -74,19 +76,19 @@ class UsersHandler(BaseHanler):
         e.put()
         return self.res_json(user.to_dict())
 
-@app.api(r'/users/<user_id>')
-class UserHandler(BaseHanler):
-    def get(self, user_id):
-        logging.debug(user_id)
-        user = User.get_by_id(long(user_id))
 
+@app.api('/users/<user_id>')
+class UserHandler(BaseHandler):
+    def get(self, user_id):
+        logging.debug('user_id')
+        user = User.get_by_id(long(user_id))
         if user:
             return self.res_json(user.to_dict())
         else:
             return self.res_error(Error.NO_USER)
 
-@app.api(r'/users/<user_id>/photos')
-class UserPhotoHandler(BaseHanler):
+@app.api('/users/<user_id>/photo')
+class UserPhotoHandler(BaseHandler):
     def get(self, user_id):
         logging.debug(user_id)
         # user = User.get_by_id(long(user_id))
