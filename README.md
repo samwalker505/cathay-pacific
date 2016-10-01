@@ -14,6 +14,20 @@ params:  email, password
 params: email, password
 set the token to header with X-WALKER-ACCESS-TOKEN
 
+#files:
+`POST /files`
+using multipart
+params: file, file_type
+file_type: 'file|image'
+description: if file_type == image, serving_url will be provided, otherwise
+download url via: `http://storage.googleapis.com/{gcs_path}`
+
+##Change logs
+# 2016-10-01
+`POST /images` -> `POST /files`
+
+
+## deleted
 #images:
 `POST /images`
 params: image

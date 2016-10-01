@@ -10,6 +10,7 @@ class FileProperties(ndb.Model):
     name = ndb.StringProperty()
     gcs_path = ndb.StringProperty()
     blob_key = ndb.BlobProperty()
+    file_type = ndb.StringProperty()
 
 class File(FileProperties, BaseModel):
     @classmethod
@@ -23,12 +24,12 @@ class File(FileProperties, BaseModel):
         return path, blob_key
 
     @classmethod
-    def add(cls, data, filename='', owner=None):
+    def add(cls, data, filename='', owner=None, file_type='file'):
         if not filename:
             import time
             filename = 'file_{}'.format(time.time())
         gcs_path, blob_key = cls.upload_to_gcs(data, filename)
-        f = File(owner=owner.key if owner else None, name=filename, gcs_path=gcs_path, blob_key=blob_key)
+        f = File(owner=owner.key if owner else None, name=filename, gcs_path=gcs_path, blob_key=blob_key, file_type=file_type)
         f.put()
         return f
 
@@ -36,10 +37,10 @@ class Image(File):
     serving_url = ndb.StringProperty()
 
     @classmethod
-    def add(cls, data, filename='', owner=None):
+    def add(cls, data, filename='', owner=None, file_type='image'):
         if not filename.endswith(('.jpg','.jpeg','.gif','.png','.bmp','.ico')):
             raise Exception('Not image')
-        f = super(Image, cls).add(data, filename, owner)
+        f = super(Image, cls).add(data, filename, owner, file_type='image')
         f.serving_url = images.get_serving_url(f.blob_key, secure_url=True)
         f.put()
         return f
