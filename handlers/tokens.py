@@ -38,7 +38,7 @@ class TokensHandler(BaseHandler):
 
         if 'fat' in self.json_body:
             fb = Facebook.connect_fb(self.json_body['fat'])
-            if fb.owner:
+            if fb and fb.owner:
                 return self.res_json(response_dict(fb.owner.get()))
 
         email = self.json_body.get('email')

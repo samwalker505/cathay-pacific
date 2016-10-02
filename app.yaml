@@ -4,7 +4,7 @@ threadsafe: yes
 
 handlers:
 
-- url: /api/v(.?)/(users|files|tokens).*
+- url: /api/v(.?)/(users|files|tokens|groups).*
   script: handlers.\2.app
 
 - url: /.*
