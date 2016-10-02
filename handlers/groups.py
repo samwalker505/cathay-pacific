@@ -89,3 +89,11 @@ class GroupMsgHandler(BaseHandler):
             msg = Message(sender=sender, msg_type=msg_type, content=content, group=group.key)
             msg.put()
         return self.res_json(msg.to_dict())
+
+@app.api('/api/v1/groups/delete')
+class GroupsDeteleHandler(BaseHandler):
+    def get(self):
+        from datetime import datetime, timedelta
+        now = datetime.utcnow()
+        for group in Group.query(Group.create_time < now+timedelta(weeks=-1)).iter():
+            group.key.delete()
