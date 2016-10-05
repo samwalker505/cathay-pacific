@@ -6,31 +6,64 @@ import json
 from common.json_encoder import JSONEncoder
 import common.config as config
 
+import jwt
+from models.user import User, Secret
+
+def get_secret(token):
+    logging.debug('Token: {}'.format(token))
+    if not token:
+        return None, None
+    else:
+        tokenArr = token.split('::')
+        if len(tokenArr) < 2:
+            return None, None
+
+        jwt_token = tokenArr[0]
+        user_id = tokenArr[1]
+        return Secret.get_by_id(user_id), jwt_token
+
+def get_user(token):
+    s, jwt_token = get_secret(token)
+    if not s:
+        return None
+    decoded = jwt.decode(jwt_token, s.secret, algorithms=['HS256'])
+    logging.debug('decoded: {}'.format(decoded))
+    if decoded:
+        return s.owner.get()
+    else:
+        return None
+    return None
+
 def user_authenticate(func):
     def func_wrapper(self, *args, **kwargs):
         token = self.request.headers.get(config.HEADER_ACCESS_TOKEN)
-        logging.debug('Token: {}'.format(token))
-        tokenArr = token.split('::')
-        if not token or len(tokenArr)< 2:
-            self.abort(403)
-
-        import jwt
-        from models.user import User, Secret
-        jwt_token = tokenArr[0]
-        user_id = tokenArr[1]
-        s = Secret.get_by_id(user_id)
-        if not s:
-            self.abort(403)
-        decoded = jwt.decode(jwt_token, s.secret, algorithms=['HS256'])
-        logging.debug('decoded: {}'.format(decoded))
-        if decoded:
-            self.user = s.owner.get()
-            func(self, *args, **kwargs)
+        user = get_user(token)
+        if user:
+            self.user = user
+            return func(self, *args, **kwargs)
         else:
             self.abort(403)
     return func_wrapper
 
-class BaseHanler(webapp2.RequestHandler):
+def get_current_user(func):
+    def func_wrapper(self, *args, **kwargs):
+        token = self.request.headers.get(config.HEADER_ACCESS_TOKEN)
+        self.user = get_user(token)
+        return func(self, *args, **kwargs)
+    return func_wrapper
+
+def output(func, output_format='json'):
+    logging.debug('enter output')
+    def func_wrapper(self, *args, **kwargs):
+        result = func(self, *args, **kwargs)
+        logging.debug(result)
+        if output_format == 'json':
+            return self.res_json(result)
+    return func_wrapper
+
+
+
+class BaseHandler(webapp2.RequestHandler):
 
     def __init__(self, request, response):
         self.json_body = {}
@@ -40,10 +73,15 @@ class BaseHanler(webapp2.RequestHandler):
         if self.request.headers['Content-Type'].split(';')[0] == 'application/json':
             logging.debug('Content-Type: json')
             self.json_body = json.loads(self.request.body)
-        try:
-            super(BaseHanler, self).dispatch()
-        except Exception as e:
-            logging.debug(e)
+        # don't indent it ....
+
+        super(BaseHandler, self).dispatch()
+
+    def get(self, *args, **kwargs):
+        pass
+
+    def post(self, *args, **kwargs):
+        pass
 
     def options(self):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
@@ -64,9 +102,10 @@ class BaseHanler(webapp2.RequestHandler):
         self.res_json(error, status)
 
     def res_json(self, content, status=200):
+        logging.debug(content)
         if isinstance(content, dict):
             self.res(json.dumps(content, cls=JSONEncoder), status)
         else:
-            err_msg = 'content is not dict'
+            err_msg = 'res_json: content is not dict'
             logging.error(err_msg)
             self.res_error('content is not dict')

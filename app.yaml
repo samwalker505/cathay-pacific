@@ -3,7 +3,8 @@ api_version: 1
 threadsafe: yes
 
 handlers:
-- url: /api/v(.?)/(users|tokens|images).*
+
+- url: /api/v(.?)/(users|files|tokens|groups).*
   script: handlers.\2.app
 
 - url: /.*
