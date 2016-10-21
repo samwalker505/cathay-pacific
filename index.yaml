@@ -15,3 +15,9 @@ indexes:
   - name: group
   - name: create_time
     direction: desc
+
+- kind: Trip
+  properties:
+  - name: owner
+  - name: update_time
+    direction: desc

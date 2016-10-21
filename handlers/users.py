@@ -5,13 +5,13 @@ import webapp2
 
 from models.user import User, Facebook
 from models.email import Email
-from handlers import BaseHandler, user_authenticate, output
+from handlers import BaseHandler, user_authenticate
 from common.constants import Error
 
 import common.micro_webapp2 as micro_webapp2
 app = micro_webapp2.WSGIApplication()
 
-@app.api('/users', format_func=output)
+@app.api('/users')
 class UsersHandler(BaseHandler):
 
     @user_authenticate
@@ -79,6 +79,23 @@ class UsersHandler(BaseHandler):
         e.put()
         return user.to_dict()
 
+    @user_authenticate
+    def put(self):
+        allow_attrs = ['firstname', 'lastname', 'nationality', 'date_of_birth', 'passport_number', 'visa_number', 'gender', 'address']
+        params = {k:v for k, v in self.json_body.iteritems() if k in allow_attrs}
+        user = self.user
+        date_of_birth = params.get('date_of_birth')
+        if date_of_birth:
+            time = long(date_of_birth)
+            from datetime import datetime
+            params['date_of_birth'] = datetime.from_timestamp(time)
+
+        gender = params.get('gender')
+        if gender and gender not in ['male', 'female', 'transgender']:
+            return self.res_error('ERROR_GENDER_NOT_ALLOWED')
+        user.update(params)
+        return self.res_json(user.to_dict())
+
 
 
 @app.api('/users/<user_id>')
@@ -91,26 +108,3 @@ class UserHandler(BaseHandler):
             return self.res_json(user.to_dict())
         else:
             return self.res_error(Error.NO_USER)
-
-    def put(self, user_id):
-        allow_attrs = ['firstname', 'lastname', 'nationality', 'date_of_birth', 'passport_number', 'visa_number']
-        params = {k:v for k, v in self.json_body.iteritems() if k in allow_attrs}
-        user = User.get_by_id(long(user_id))
-        if not user:
-            return self.res_error(Error.NO_USER)
-
-        date_of_birth = params.get('date_of_birth')
-        if date_of_birth:
-            time = long(date_of_birth)
-            from datetime import datetime
-            params['date_of_birth'] = datetime.from_timestamp(time)
-        user.update(params)
-        return self.res_json(user.to_dict())
-
-
-@app.api('/users/<user_id>/photo')
-class UserPhotoHandler(BaseHandler):
-    def get(self, user_id):
-        logging.debug(user_id)
-        # user = User.get_by_id(long(user_id))
-        self.res_json({user_id: 'photo'})

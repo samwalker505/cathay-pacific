@@ -1,5 +1,6 @@
 from datetime import datetime
 from google.appengine.ext import ndb
+from google.appengine.datastore.datastore_query import Cursor
 import json
 
 class JSONEncoder(json.JSONEncoder):
@@ -9,5 +10,8 @@ class JSONEncoder(json.JSONEncoder):
             return o.isoformat()
         elif isinstance(o, ndb.Key):
             return o.id()
+
+        elif isinstance(o, Cursor):
+            return o.to_websafe_string()
 
         return json.JSONEncoder.default(self, o)

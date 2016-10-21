@@ -69,8 +69,28 @@ class BaseHandler(webapp2.RequestHandler):
         self.json_body = {}
         self.initialize(request, response)
 
+    def query(self, kls, per_page=1000, filters=[]):
+        from google.appengine.datastore.datastore_query import Cursor
+        cursor = Cursor.from_websafe_string(str(self.request.get('cursor')))
+        query = kls.query()
+        if filters:
+            logging.debug('filters: {}'.format(filters))
+            for f in filters:
+                query.filter(f)
+
+        results, next_cursor, more = query.fetch_page(per_page, start_cursor=cursor)
+        result = {
+            'cursor': next_cursor,
+            'results': [result.to_dict() for result in results],
+            'count': query.count(),
+            'more': more
+        }
+
+        return result
+
     def dispatch(self):
-        if self.request.headers['Content-Type'].split(';')[0] == 'application/json':
+        content_type = self.request.headers.get('Content-Type')
+        if content_type and content_type.split(';')[0] == 'application/json':
             logging.debug('Content-Type: json')
             self.json_body = json.loads(self.request.body)
         # don't indent it ....
