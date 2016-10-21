@@ -31,6 +31,17 @@ export default {
     return {
       msg: 'Welcome to Samwalker Vue.js App'
     }
+  },
+  created () {
+    this.$http.get('/api/v1/example').then((response) => {
+  // success callback
+      console.log(response.data)
+      this.msg = response.data.main;
+    }, (response) => {
+      // error callback
+      console.error(response);
+    });
+
   }
 }
 </script>
