@@ -100,3 +100,9 @@ ENV/
 
 # secret
 secret.py
+
+# vue
+.DS_Store
+node_modules/
+dist/
+npm-debug.log

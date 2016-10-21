@@ -4,8 +4,18 @@ threadsafe: yes
 
 handlers:
 
+- url: /public
+  static_dir: public
+
 - url: /api/v(.?)/(users|files|tokens|groups).*
   script: handlers.\2.app
 
 - url: /.*
-  script: handlers.example.app
+  script: views.index.app
+
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
