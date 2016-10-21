@@ -31,7 +31,13 @@ class Facebook(FacebookProperty):
 class UserProperty(ndb.Model):
     email = ndb.StringProperty()
     password = ndb.StringProperty()
-    name = ndb.StringProperty()
+    firstname = ndb.StringProperty()
+    lastname = ndb.StringProperty()
+    nationality = ndb.StringProperty()
+    date_of_birth = ndb.DateTimeProperty()
+    passport_number = ndb.StringProperty()
+    visa_number = ndb.StringProperty()
+    name = ndb.ComputedProperty(lambda self: '{} {}'.format(self.firstname, self.lastname) if self.firstname and self.lastname else '')
     access_level = ndb.IntegerProperty(default=AccessLevel.NORMAL)
     facebook = ndb.StructuredProperty(FacebookProperty)
 

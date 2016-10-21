@@ -14,7 +14,7 @@ class BaseModel(ndb.Model):
     def update(self, update_dict):
         for key, val in update_dict.iteritems():
             if key in self.__class__._properties:
-                self[key] = val
+                setattr(self, key, val)
                 self.put()
         return self
 

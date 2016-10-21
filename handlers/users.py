@@ -37,7 +37,7 @@ class UsersHandler(BaseHandler):
         else:
             create_dict = {
                 'email':fb.email,
-                'name':fb.name,
+                'firstname':fb.name,
                 'facebook':fb
             }
             user = User.create(create_dict)
@@ -72,7 +72,7 @@ class UsersHandler(BaseHandler):
         create_dict = {
             'email': email,
             'password': md5.new(password).hexdigest(),
-            'name': name
+            'firstname': name
         }
         user = User.create(create_dict)
         e.owner = user.key
@@ -80,8 +80,10 @@ class UsersHandler(BaseHandler):
         return user.to_dict()
 
 
+
 @app.api('/users/<user_id>')
 class UserHandler(BaseHandler):
+
     def get(self, user_id):
         logging.debug('user_id')
         user = User.get_by_id(long(user_id))
@@ -89,6 +91,22 @@ class UserHandler(BaseHandler):
             return self.res_json(user.to_dict())
         else:
             return self.res_error(Error.NO_USER)
+
+    def put(self, user_id):
+        allow_attrs = ['firstname', 'lastname', 'nationality', 'date_of_birth', 'passport_number', 'visa_number']
+        params = {k:v for k, v in self.json_body.iteritems() if k in allow_attrs}
+        user = User.get_by_id(long(user_id))
+        if not user:
+            return self.res_error(Error.NO_USER)
+
+        date_of_birth = params.get('date_of_birth')
+        if date_of_birth:
+            time = long(date_of_birth)
+            from datetime import datetime
+            params['date_of_birth'] = datetime.from_timestamp(time)
+        user.update(params)
+        return self.res_json(user.to_dict())
+
 
 @app.api('/users/<user_id>/photo')
 class UserPhotoHandler(BaseHandler):
