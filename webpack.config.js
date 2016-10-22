@@ -15,6 +15,7 @@ module.exports = {
         loader: 'vue',
         options: {
           // vue-loader options go here
+          root: path.resolve(__dirname, './public')
         }
       },
       {

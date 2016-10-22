@@ -2,6 +2,7 @@
 </template>
 <script>
 export default {
+  name: 'trip',
   beforeCreate () {
     const accessToken = this.$route.query.access_token;
     const tripId = this.$route.params.trip_id;
