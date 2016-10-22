@@ -81,7 +81,9 @@ class TripHandler(BaseTripHandler):
         if not access_token:
             return None
         trip = Trip.get_by_id(long(trip_id))
-        if not trip.validate_token(access_token):
+        try:
+            trip.validate_token(access_token)
+        except:
             return None
         return trip
 
