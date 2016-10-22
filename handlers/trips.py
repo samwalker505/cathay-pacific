@@ -12,6 +12,9 @@ app = micro_webapp2.WSGIApplication()
 @app.api('/trips')
 class TripsHandler(BaseHandler):
 
+    def parsed_params(self):
+        pass
+
     @user_authenticate
     def get(self):
         result = self.query(Trip, filters=[Trip.owner==self.user.key])
@@ -29,6 +32,8 @@ class TripsHandler(BaseHandler):
             params['owner'] = self.user.key
         else:
             user_info = params.get('user_info')
+            from models.user import User
+            user_info = {k:v for k, v in user_info.iteritems()}
             date_of_birth = user_info.get('date_of_birth')
             nationality = user_info.get('nationality')
             c, k =  Country.get_by_code(nationality)

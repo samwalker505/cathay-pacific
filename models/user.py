@@ -41,6 +41,7 @@ class UserProperty(ndb.Model):
     facebook = ndb.StructuredProperty(FacebookProperty)
 
 class User(UserProperty, BaseModel):
+    UPDATE_FIELDS = ['email', 'firstname', 'lastname', 'nationality', 'date_of_birth', 'passport_number', 'visa_number', 'gender', 'address']
     name = ndb.ComputedProperty(lambda self: '{} {}'.format(self.firstname if self.firstname else '', self.lastname if self.lastname else '').strip())
 
     def to_dict(self, include=None, exclude=None):

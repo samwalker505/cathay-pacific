@@ -84,7 +84,7 @@ class UsersHandler(BaseHandler):
 
     @user_authenticate
     def put(self):
-        allow_attrs = ['firstname', 'lastname', 'nationality', 'date_of_birth', 'passport_number', 'visa_number', 'gender', 'address']
+        allow_attrs = User.UPDATE_FIELDS
         params = {k:v for k, v in self.json_body.iteritems() if k in allow_attrs}
         user = self.user
         date_of_birth = params.get('date_of_birth')
