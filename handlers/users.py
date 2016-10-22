@@ -9,6 +9,7 @@ from models.email import Email
 from models.trip import Country
 from handlers import BaseHandler, user_authenticate
 from common.constants import Error
+from common.util import Util
 
 import common.micro_webapp2 as micro_webapp2
 app = micro_webapp2.WSGIApplication()
@@ -87,10 +88,10 @@ class UsersHandler(BaseHandler):
         params = {k:v for k, v in self.json_body.iteritems() if k in allow_attrs}
         user = self.user
         date_of_birth = params.get('date_of_birth')
+        logging.debug(date_of_birth)
         if date_of_birth:
-            time = long(date_of_birth)
-            from datetime import datetime
-            params['date_of_birth'] = datetime.from_timestamp(time)
+
+            params['date_of_birth'] = Util.from_timestamp(date_of_birth)
 
         gender = params.get('gender')
         if gender and gender not in ['male', 'female', 'transgender']:
@@ -98,11 +99,11 @@ class UsersHandler(BaseHandler):
 
         nationality = params.get('nationality')
         if nationality:
-            key = ndb.Key(Country, str(nationality))
-            country = key.get()
+            country, key = Country.get_by_code(nationality)
             if not country:
-                return self.res_error('ERROR_INVALID_COUNTRY')
+                return self.res_error('ERROR_COUNTRY_NOT_ALLOWED')
             params['nationality'] = key
+
         user.update(params)
         return self.res_json(user.to_dict())
 
