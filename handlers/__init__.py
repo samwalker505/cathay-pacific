@@ -76,7 +76,7 @@ class BaseHandler(webapp2.RequestHandler):
         if filters:
             logging.debug('filters: {}'.format(filters))
             for f in filters:
-                query.filter(f)
+                query = query.filter(f)
 
         results, next_cursor, more = query.fetch_page(per_page, start_cursor=cursor)
         result = {

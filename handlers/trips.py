@@ -45,7 +45,7 @@ class BaseTripHandler(BaseHandler):
             if params.get(key):
                 params[key] = Util.from_timestamp(params[key])
 
-        for key in ['last_visit_country', 'next_visit_country']:
+        for key in ['last_visit_country', 'next_visit_country', 'destination']:
             if params.get(key):
                 c, k = Country.get_by_code(params.get(key))
                 logging.debug(k)
