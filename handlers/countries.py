@@ -2,12 +2,11 @@ import logging
 import common.micro_webapp2 as micro_webapp2
 from common.constants import Error
 from handlers import BaseHandler, user_authenticate
+from models.trip import Country
 app = micro_webapp2.WSGIApplication()
 
-@app.api(r'/example')
-class MainHandler(BaseHandler):
-    def get(self, main_id=None):
-        if not main_id:
-            main_id = 'Hello, World!'
-        test = {'main': main_id}
-        self.res_json(test)
+@app.api(r'/countries')
+class CountriesHandler(BaseHandler):
+    def get(self):
+        result = self.query(Country)
+        return self.res_json(result)
