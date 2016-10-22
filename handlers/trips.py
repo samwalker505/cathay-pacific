@@ -27,14 +27,15 @@ class BaseTripHandler(BaseHandler):
             user_info = {k:v for k, v in user_info.iteritems() if k in User.UPDATE_FIELDS}
             logging.debug(user_info)
             date_of_birth = user_info.get('date_of_birth')
-            nationality = user_info.get('nationality')
-            c, k =  Country.get_by_code(nationality)
 
-            if not c:
-                self.res_error('ERROR_COUNTRY_NOT_ALLOWED')
-            else:
-                logging.debug('user_info nationality')
-                user_info['nationality'] = k
+            nationality = user_info.get('nationality')
+            if nationality:
+                c, k =  Country.get_by_code(nationality)
+                if not c:
+                    return self.res_error('ERROR_COUNTRY_NOT_ALLOWED')
+                else:
+                    logging.debug('user_info nationality')
+                    user_info['nationality'] = k
 
             if date_of_birth:
                 user_info['date_of_birth'] = Util.from_timestamp(params['user_info']['date_of_birth'])
