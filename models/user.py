@@ -38,10 +38,11 @@ class UserProperty(ndb.Model):
     date_of_birth = ndb.DateTimeProperty()
     passport_number = ndb.StringProperty()
     visa_number = ndb.StringProperty()
-    name = ndb.ComputedProperty(lambda self: '{} {}'.format(self.firstname if self.firstname else '', self.lastname if self.lastname else '').strip())
     facebook = ndb.StructuredProperty(FacebookProperty)
 
 class User(UserProperty, BaseModel):
+    name = ndb.ComputedProperty(lambda self: '{} {}'.format(self.firstname if self.firstname else '', self.lastname if self.lastname else '').strip())
+
     def to_dict(self, include=None, exclude=None):
         d = super(User, self).to_dict(include, exclude)
         del d['password']
