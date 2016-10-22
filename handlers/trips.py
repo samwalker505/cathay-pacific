@@ -79,19 +79,25 @@ class TripHandler(BaseTripHandler):
     def get_trip(self, trip_id):
         access_token = self.request.get('access_token')
         if not access_token:
-            return self.res_error('ERROR_NO_ACCESS_TOKEN')
+            return None
         trip = Trip.get_by_id(long(trip_id))
         if not trip.validate_token(access_token):
-            return self.res_error('ERROR_INVALID_ACCESS_TOKEN')
+            return None
         return trip
 
     @get_current_user
     def put(self, trip_id):
         trip = self.get_trip(trip_id)
-        params = self.parsed_params()
-        trip.update(params)
-        return self.res_json(trip.to_dict())
+        if trip:
+            params = self.parsed_params()
+            trip.update(params)
+            return self.res_json(trip.to_dict())
+        else:
+            return self.res_error('ERROR_TRIP_NOT_ALLOWED')
 
     def get(self, trip_id):
         trip = self.get_trip(trip_id)
-        return self.res_json(trip.to_dict())
+        if trip:
+            return self.res_json(trip.to_dict())
+        else:
+            return self.res_error('ERROR_TRIP_NOT_ALLOWED')
