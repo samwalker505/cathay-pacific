@@ -1,8 +1,13 @@
 from google.appengine.ext import ndb
 from models import BaseModel
+from models.user import UserProperty
+
+class Country(BaseModel):
+    name = ndb.StringProperty()
+    code = ndb.StringProperty()
 
 class Trip(BaseModel):
-    name = ndb.StringProperty()
+    user_info = ndb.StructuredProperty(UserProperty)
     owner = ndb.KeyProperty()
     flight_number_to = ndb.StringProperty()
     flight_number_back = ndb.StringProperty()
@@ -10,4 +15,5 @@ class Trip(BaseModel):
     destination = ndb.StringProperty()
     last_visit_country = ndb.StringProperty()
     next_visit_country = ndb.StringProperty()
-    duration = ndb.FloatProperty()
+    from_date = ndb.DateTimeProperty()
+    to_date = ndb.DateTimeProperty()

@@ -119,13 +119,13 @@ class BaseHandler(webapp2.RequestHandler):
             'code': status,
             'message': content
         }
-        self.res_json(error, status)
+        return self.res_json(error, status)
 
     def res_json(self, content, status=200):
         logging.debug(content)
         if isinstance(content, dict):
-            self.res(json.dumps(content, cls=JSONEncoder), status)
+            return self.res(json.dumps(content, cls=JSONEncoder), status)
         else:
             err_msg = 'res_json: content is not dict'
             logging.error(err_msg)
-            self.res_error('content is not dict')
+            return self.res_error('content is not dict')

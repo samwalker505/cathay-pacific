@@ -7,7 +7,7 @@ handlers:
 - url: /public
   static_dir: public
 
-- url: /api/v(.?)/(example|users|files|tokens|groups|trips).*
+- url: /api/v(.?)/(example|users|files|tokens|groups|trips|init_countries).*
   script: handlers.\2.app
 
 - url: /.*
