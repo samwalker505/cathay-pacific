@@ -77,7 +77,7 @@ class UsersHandler(BaseHandler):
         user = User.create(create_dict)
         e.owner = user.key
         e.put()
-        return user.to_dict()
+        return self.res_json(user.to_dict())
 
     @user_authenticate
     def put(self):
