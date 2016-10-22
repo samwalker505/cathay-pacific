@@ -34,6 +34,10 @@ class Trip(BaseModel):
         t = jwt.encode({'uid': self.key.id()}, Trip.HASH, algorithm='HS256')
         return t
 
+    def validate_token(self, token):
+        result = jwt.decode(token, Trip.HASH, algorithms=['HS256'])
+        return True if result and result['uid'] == self.key.id() else False
+
     def to_dict(self, include=None, exclude=None):
         d = super(Trip, self).to_dict(include, exclude)
         for key in ['password', 'access_level', 'mark_deleted']:
