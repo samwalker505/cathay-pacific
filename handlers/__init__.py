@@ -105,7 +105,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def options(self):
         self.response.headers['Access-Control-Allow-Origin'] = '*'
-        self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept'
+        self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, X-WALKER-ACCESS-TOKEN'
         self.response.headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, DELETE'
 
     def res(self, content='no content', status=200, content_type='application/json'):

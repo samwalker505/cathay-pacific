@@ -1,10 +1,12 @@
 import logging
 import md5
 from validate_email import validate_email
+from google.appengine.ext import ndb
 import webapp2
 
 from models.user import User, Facebook
 from models.email import Email
+from models.trip import Country
 from handlers import BaseHandler, user_authenticate
 from common.constants import Error
 
@@ -19,7 +21,7 @@ class UsersHandler(BaseHandler):
         logging.debug('enter user get')
         import inspect
         logging.debug(self.user.to_dict())
-        return self.user.to_dict()
+        return self.res_json(self.user.to_dict())
 
     def connect_fb(self):
         fb = Facebook.connect_fb(self.json_body['fat'])
@@ -93,6 +95,14 @@ class UsersHandler(BaseHandler):
         gender = params.get('gender')
         if gender and gender not in ['male', 'female', 'transgender']:
             return self.res_error('ERROR_GENDER_NOT_ALLOWED')
+
+        nationality = params.get('nationality')
+        if nationality:
+            key = ndb.Key(Country, str(nationality))
+            country = key.get()
+            if not country:
+                return self.res_error('ERROR_INVALID_COUNTRY')
+            params['nationality'] = key
         user.update(params)
         return self.res_json(user.to_dict())
 

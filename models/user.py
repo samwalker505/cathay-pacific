@@ -33,7 +33,7 @@ class UserProperty(ndb.Model):
     password = ndb.StringProperty()
     firstname = ndb.StringProperty()
     lastname = ndb.StringProperty()
-    nationality = ndb.StringProperty()
+    nationality = ndb.KeyProperty()
     date_of_birth = ndb.DateTimeProperty()
     passport_number = ndb.StringProperty()
     visa_number = ndb.StringProperty()
