@@ -17,6 +17,7 @@ class Country(BaseModel):
         return result, key
 
 class Trip(BaseModel):
+
     user_info = ndb.StructuredProperty(UserProperty)
     owner = ndb.KeyProperty()
     flight_number_to = ndb.StringProperty()
@@ -27,3 +28,10 @@ class Trip(BaseModel):
     next_visit_country = ndb.StringProperty()
     from_date = ndb.DateTimeProperty()
     to_date = ndb.DateTimeProperty()
+
+    def to_dict(self, include=None, exclude=None):
+        d = super(Trip, self).to_dict(include, exclude)
+        del d['user_info']['password']
+        del d['user_info']['access_level']
+        del d['user_info']['mark_deleted']
+        return d

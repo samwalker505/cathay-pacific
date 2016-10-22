@@ -1,4 +1,5 @@
 import logging
+import jwt
 
 import common.micro_webapp2 as micro_webapp2
 from common.constants import Error
@@ -7,6 +8,8 @@ from common.constants import Error
 from models.trip import Trip, Country
 from handlers import BaseHandler, get_current_user, user_authenticate
 app = micro_webapp2.WSGIApplication()
+
+HASH = '9ac696e7bbfd0ac3ec6e94933485b7c2'
 
 @app.api('/trips')
 class TripsHandler(BaseHandler):
@@ -24,7 +27,6 @@ class TripsHandler(BaseHandler):
         if self.user:
             params['user_info'] = self.user
             params['owner'] = self.user.key
-
         for key in ['last_visit_country, next_visit_country']:
             if params.get(key):
                 c, k = Country.get_by_code(params.get(key))
@@ -34,7 +36,10 @@ class TripsHandler(BaseHandler):
                     params[key] = k
 
         trip = Trip.create(params)
-        return self.res_json(trip.to_dict())
+        d = trip.to_dict()
+        t = jwt.encode(trip.key.id(), HASH, algorithm='HS256')
+        d['access_token'] = t
+        return self.res_json(d)
 
 @app.api('/trips/<trip_id>')
 class TripHandler(BaseHandler):

@@ -30,19 +30,18 @@ class Facebook(FacebookProperty):
 
 class UserProperty(ndb.Model):
     email = ndb.StringProperty()
-    password = ndb.StringProperty()
     firstname = ndb.StringProperty()
     lastname = ndb.StringProperty()
+    password = ndb.StringProperty()
+    access_level = ndb.IntegerProperty(default=AccessLevel.NORMAL)
     nationality = ndb.KeyProperty()
     date_of_birth = ndb.DateTimeProperty()
     passport_number = ndb.StringProperty()
     visa_number = ndb.StringProperty()
-    name = ndb.ComputedProperty(lambda self: '{} {}'.format(self.firstname, self.lastname) if self.firstname and self.lastname else '')
-    access_level = ndb.IntegerProperty(default=AccessLevel.NORMAL)
+    name = ndb.ComputedProperty(lambda self: '{} {}'.format(self.firstname if self.firstname else '', self.lastname if self.lastname else '').strip())
     facebook = ndb.StructuredProperty(FacebookProperty)
 
 class User(UserProperty, BaseModel):
-
     def to_dict(self, include=None, exclude=None):
         d = super(User, self).to_dict(include, exclude)
         del d['password']
