@@ -1,28 +1,30 @@
 <template lang="jade">
-  div.arrival_card_container {{trip}}
+  div.arrival_card_container
     div.arrival_card_image
     div.arrival_card_info
       div.lastname.fixed.left {{trip.user_info.firstname}}
       div.firstname.fixed.left {{trip.user_info.lastname}}
       div.nationality.fixed.left {{trip.user_info.nationality | nationality}}
-      div.passport_number.fixed.left K12345678
-      div.visa_number.fixed.left
-      div.foreign_address.fixed.left Thanon Ram Inthra 97, Khan Na Yao, Bangkok 10230
-      div.date_of_birth_day.fixed 30
-      div.date_of_birth_month.fixed 01
-      div.date_of_birth_year.fixed 1995
-      div.flight_number_to.fixed CX 2016
+      div.passport_number.fixed.left {{trip.user_info.passport_number}}
+      div.visa_number.fixed.left {{trip.user_info.visa_number}}
+      div.foreign_address.fixed.left {{trip.foreign_address}}
+      div.date_of_birth_day.fixed {{trip.user_info.date_of_birth | day}}
+      div.date_of_birth_month.fixed {{trip.user_info.date_of_birth | month}}
+      div.date_of_birth_year.fixed {{trip.user_info.date_of_birth | year}}
+      div.flight_number_to.fixed {{trip.flight_number_to}}
 </template>
 
 <script>
-  import countries from '~public/countries.json'
+  import moment from 'moment'
+  import * as countries from '../countries.json'
   export default {
     data () {
       return {
-        trip:{}
+        trip:{},
+        countries: countries
       }
     },
-    created () {
+    beforeMount () {
       const accessToken = this.$route.query.access_token;
       const tripId = this.$route.params.trip_id;
       console.log(accessToken);
@@ -38,11 +40,24 @@
     filters: {
       day: (val) => {
         console.log(val);
-        return ;
+        return moment(val, 'YYYY-MM-DDTHH:mm:ss').format('DD');
+      },
+      month: (val) => {
+        return moment(val, 'YYYY-MM-DDTHH:mm:ss').format('MM');
+      },
+      year: (val) => {
+        return moment(val, 'YYYY-MM-DDTHH:mm:ss').format('YYYY');
       },
       nationality: (val) => {
-        console.log(val);
-        console.log(countries);
+        if (val == 'CN') {
+          return 'Chinese';
+        } else if (val == 'TW') {
+          return 'Taiwanese';
+        } else if (val == 'TH') {
+          return 'Thai';
+        } else {
+          return val;
+        }
       }
     }
   }
