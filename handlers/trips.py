@@ -70,8 +70,6 @@ class TripsHandler(BaseTripHandler):
         params = self.parsed_params()
         trip = Trip.create(params)
         d = trip.to_dict()
-        t = trip.gen_token()
-        d['access_token'] = t
         return self.res_json(d)
 
 @app.api('/trips/<trip_id>')

@@ -43,4 +43,7 @@ class Trip(BaseModel):
         for key in ['password', 'access_level', 'mark_deleted']:
             if d.get('user_info') and d['user_info'].get(key):
                 del d['user_info'][key]
+
+        t = self.gen_token()
+        d['access_token'] = t
         return d
