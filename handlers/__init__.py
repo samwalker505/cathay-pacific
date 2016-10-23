@@ -69,7 +69,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.json_body = {}
         self.initialize(request, response)
 
-    def query(self, kls, per_page=1000, filters=[]):
+
+    def query(self, kls, per_page=1000, filters=[], order=None):
         from google.appengine.datastore.datastore_query import Cursor
         cursor = Cursor.from_websafe_string(str(self.request.get('cursor')))
         query = kls.query()
@@ -77,6 +78,8 @@ class BaseHandler(webapp2.RequestHandler):
             logging.debug('filters: {}'.format(filters))
             for f in filters:
                 query = query.filter(f)
+        if order:
+            query = query.order(order)
 
         results, next_cursor, more = query.fetch_page(per_page, start_cursor=cursor)
         result = {

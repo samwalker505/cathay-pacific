@@ -16,12 +16,10 @@
 
 <script>
   import moment from 'moment'
-  import * as countries from '../countries.json'
   export default {
     data () {
       return {
-        trip:{},
-        countries: countries
+        trip:{}
       }
     },
     beforeMount () {

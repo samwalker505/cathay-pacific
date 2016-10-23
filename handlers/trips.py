@@ -62,7 +62,7 @@ class BaseTripHandler(BaseHandler):
 class TripsHandler(BaseTripHandler):
     @user_authenticate
     def get(self):
-        result = self.query(Trip, filters=[Trip.owner==self.user.key])
+        result = self.query(Trip, filters=[Trip.owner==self.user.key], order=-Trip.create_time)
         return self.res_json(result)
 
     @get_current_user
