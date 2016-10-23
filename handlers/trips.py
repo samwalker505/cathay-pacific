@@ -1,5 +1,8 @@
 import logging
 import jwt
+import json
+from google.appengine.ext import ndb
+from google.appengine.api import urlfetch
 
 import common.micro_webapp2 as micro_webapp2
 from common.constants import Error
@@ -55,6 +58,24 @@ class BaseTripHandler(BaseHandler):
                     return self.res_error('ERROR_COUNTRY_NOT_ALLOWED')
                 else:
                     params[key] = k
+
+        if params.get('flight_number_to') and not params.get('destination'):
+            import urllib
+            url_params = {
+                "airlineNameEn":"Cathay Pacific",
+                "primaryPreferedId": params.get('flight_number_to')
+            }
+            url = 'http://52.88.167.56/api/v0/schedule/records?{}'.format(urllib.urlencode(url_params))
+            logging.debug(url)
+            try:
+                result = urlfetch.fetch(url)
+                if result.status_code == 200:
+                    result = json.loads(result.content)
+                    destination = result['data'][0]['airportNameEn']
+                    params['destination'] =  ndb.Key(Country, str(destination))
+            except urlfetch.Error:
+                logging.exception('Caught exception fetching url')
+
 
         return params
 
