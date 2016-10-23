@@ -15,6 +15,7 @@
 </template>
 
 <script>
+  import countries from './country.json'
   import moment from 'moment'
   export default {
     data () {
@@ -47,15 +48,12 @@
         return moment(val, 'YYYY-MM-DDTHH:mm:ss').format('YYYY');
       },
       nationality: (val) => {
-        if (val == 'CN') {
-          return 'Chinese';
-        } else if (val == 'TW') {
-          return 'Taiwanese';
-        } else if (val == 'TH') {
-          return 'Thai';
-        } else {
-          return val;
+        for (let c of countries.result) {
+          if (val == c.alpha2Code) {
+            return c.demonym;
+          }
         }
+        return val;
       }
     }
   }
