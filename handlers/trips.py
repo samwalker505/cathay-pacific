@@ -13,7 +13,7 @@ class BaseTripHandler(BaseHandler):
     def parsed_params(self):
         allow_attrs = ['flight_number_to', 'flight_number_back', 'foreign_address',
                         'destination', 'last_visit_country', 'next_visit_country',
-                        'from_date', 'to_date', 'user_info']
+                        'from_date', 'to_date', 'user_info', 'title']
         params = {k:v for k, v in self.json_body.iteritems() if k in allow_attrs}
 
         if self.user:

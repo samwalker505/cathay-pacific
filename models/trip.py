@@ -21,6 +21,7 @@ class Trip(BaseModel):
     HASH = '9ac696e7bbfd0ac3ec6e94933485b7c2'
     user_info = ndb.StructuredProperty(UserProperty)
     owner = ndb.KeyProperty()
+    title = ndb.StringProperty()
     flight_number_to = ndb.StringProperty()
     flight_number_back = ndb.StringProperty()
     foreign_address = ndb.StringProperty()
